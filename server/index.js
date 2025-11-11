@@ -7,22 +7,23 @@ app.use(cors());
 
 const REDDIT_URL = "https://www.reddit.com/r/reactjs.json";
 
-// Root route (so Render homepage won’t show "Cannot GET /")
 app.get("/", (req, res) => {
   res.send("Backend is running. Visit /reddit to see Reddit JSON data.");
 });
 
-// Reddit data route
 app.get("/reddit", async (req, res) => {
   try {
     const response = await fetch(REDDIT_URL, {
-      headers: { "User-Agent": "render-proxy/1.0" },
+      headers: {
+        "User-Agent": "rakesh-react-task:v1.0 (by /u/demo_user)", // Important for Reddit API
+      },
     });
 
     if (!response.ok) {
+      console.error(`Reddit API returned ${response.status}`);
       return res
         .status(response.status)
-        .json({ error: "Reddit returned an error" });
+        .json({ error: "Reddit returned an error", status: response.status });
     }
 
     const data = await response.json();
@@ -33,7 +34,7 @@ app.get("/reddit", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 10000; // Render assigns its own port
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Proxy server running at http://localhost:${PORT}`);
 });
