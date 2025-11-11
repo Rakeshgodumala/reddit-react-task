@@ -7,9 +7,8 @@ app.use(cors({ origin: "*", methods: ["GET"] }));
 
 const REDDIT_URL = "https://www.reddit.com/r/reactjs.json";
 
-// Two proxy URLs: one primary, one fallback
-const PROXY_PRIMARY = "https://api.allorigins.win/raw?url=";
-const PROXY_BACKUP = "https://thingproxy.freeboard.io/fetch/";
+// Use a reliable free proxy API
+const PROXY_URL = "https://api.codetabs.com/v1/proxy?quest=";
 
 app.get("/", (req, res) => {
   res.send("Backend is running. Visit /reddit to see Reddit JSON data.");
@@ -17,18 +16,12 @@ app.get("/", (req, res) => {
 
 app.get("/reddit", async (req, res) => {
   try {
-    // Try with the primary proxy first
-    let response = await fetch(PROXY_PRIMARY + encodeURIComponent(REDDIT_URL));
+    const response = await fetch(PROXY_URL + encodeURIComponent(REDDIT_URL));
 
     if (!response.ok) {
-      console.warn("Primary proxy failed, trying backup...");
-      response = await fetch(PROXY_BACKUP + REDDIT_URL);
-    }
-
-    if (!response.ok) {
-      console.error(`Both proxies failed with ${response.status}`);
+      console.error("Proxy fetch failed:", response.status);
       return res.status(response.status).json({
-        error: "Proxy fetch error",
+        error: "Proxy fetch failed",
         status: response.status,
       });
     }
